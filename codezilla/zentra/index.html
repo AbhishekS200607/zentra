@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZENTRA - Find the Best Tech in Your Budget</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Applying the Inter font to the whole page */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c0a09; /* A very dark, near-black color */
+        }
+
+        /* Custom gradient for the hero text */
+        .text-gradient {
+            background: linear-gradient(90deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Arrow animation for the button */
+        .arrow-animation {
+            transition: transform 0.3s ease;
+        }
+        .group:hover .arrow-animation {
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body class="text-white overflow-x-hidden">
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header/Navigation -->
+        <header class="py-6 px-4 sm:px-6 lg:px-8">
+            <nav class="flex justify-between items-center max-w-7xl mx-auto">
+                <a href="#" class="text-2xl font-bold tracking-tighter">ZENTRA</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="phone.html" class="text-gray-400 hover:text-white transition-colors">Phones</a>
+                    <a href="laptop.html" class="text-gray-400 hover:text-white transition-colors">Laptops</a>
+                    <a href="tablet.html" class="text-gray-400 hover:text-white transition-colors">Tablets</a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+        </header>
+        <!-- Mobile Menu (hidden by default) -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-2">
+            <a href="phone.html" class="block text-gray-400 hover:text-white transition-colors rounded-md px-3 py-2">Phones</a>
+            <a href="laptop.html" class="block text-gray-400 hover:text-white transition-colors rounded-md px-3 py-2">Laptops</a>
+            <a href="tablet.html" class="block text-gray-400 hover:text-white transition-colors rounded-md px-3 py-2">Tablets</a>
+        </div>
+
+
+        <!-- Main Hero Section -->
+        <main class="flex-grow flex items-center px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <!-- Left Column: Text Content -->
+                <div class="text-center md:text-left">
+                    <h1 class="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tighter leading-tight">
+                        Stop Guessing.
+                        <span class="text-gradient">Start Finding.</span>
+                    </h1>
+                    <p class="mt-6 text-lg text-gray-400 max-w-xl mx-auto md:mx-0">
+                        Enter your budget and we'll analyze thousands of products to find the undisputed best-in-class item for you. No more endless scrolling, just smart decisions.
+                    </p>
+                    <div class="mt-8 flex justify-center md:justify-start">
+                        <a href="phone.html" class="group bg-white text-black font-bold py-3 px-6 rounded-lg flex items-center space-x-2 text-lg hover:bg-gray-200 transition-all transform hover:scale-105">
+                            <span>Explore Phones</span>
+                            <svg class="w-6 h-6 arrow-animation" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Logo Visual -->
+                <div class="flex justify-center items-center p-4">
+                    <img src="C:\Users\Lenovo\Desktop\codezilla\logo.jpg" alt="ZENTRA Logo" class="w-full max-w-xs md:max-w-sm transform transition-transform duration-500 hover:scale-110" onerror="this.onerror=null; this.src='https://placehold.co/400x150/0c0a09/FFFFFF?text=ZENTRA';">
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZENTRA - Find the Best Laptops</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0c0a09; color: #f0f0f0; }
+        .input-glow:focus { outline: none; box-shadow: 0 0 0 2px #a78bfa; }
+        .card-enter { opacity: 0; transform: translateY(30px); transition: opacity 0.5s ease-out, transform 0.5s ease-out; }
+        .card-enter-active { opacity: 1; transform: translateY(0); }
+        .loader { width: 50px; height: 50px; border-radius: 50%; border: 5px solid #333; border-top-color: #a78bfa; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .compare-button-enter { opacity: 0; transform: translateY(20px); transition: all 0.3s ease; }
+        .compare-button-active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <header class="absolute top-0 left-0 w-full p-6">
+        <nav class="flex justify-between items-center max-w-7xl mx-auto">
+            <a href="index.html" class="text-2xl font-bold tracking-tighter">ZENTRA</a>
+            <div class="flex items-center space-x-8">
+                <a href="phone.html" class="text-gray-400 hover:text-white transition-colors">Phones</a>
+                <a href="laptop.html" class="text-white font-semibold border-b-2 border-violet-500 pb-1">Laptops</a>
+                <a href="tablet.html" class="text-gray-400 hover:text-white transition-colors">Tablets</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="w-full max-w-4xl text-center transition-opacity duration-500">
+        <div id="budget-section">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter mb-4">Find Your Perfect Laptop</h1>
+            <p class="text-gray-400 mb-8 max-w-xl mx-auto">Enter your maximum budget and we'll find the top 5 laptops, balancing performance, display, and build quality.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <div class="relative w-full sm:w-auto">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-gray-400">₹</span>
+                    <input type="number" id="budget-input" placeholder="Enter your budget" class="bg-gray-800 border border-gray-700 rounded-lg py-3 pr-4 pl-10 w-full sm:w-80 text-lg input-glow transition-shadow">
+                </div>
+                <button id="find-button" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors w-full sm:w-auto">Find Laptops</button>
+            </div>
+            <p id="error-message" class="text-red-500 mt-2 h-5"></p>
+        </div>
+
+        <div id="loader-section" class="hidden flex-col items-center justify-center py-12">
+            <div class="loader"></div>
+            <p class="mt-4 text-lg text-gray-400">Analyzing the best options for you...</p>
+        </div>
+
+        <div id="results-section" class="hidden w-full">
+            <h2 class="text-3xl font-bold mb-2">Top 5 Laptops Under <span id="budgetText" class="text-violet-400"></span></h2>
+            <p class="text-gray-400 mb-8">Here are the best options we found based on your budget.</p>
+            <div id="results-grid" class="grid grid-cols-1 gap-6"></div>
+            <div id="action-buttons" class="mt-8 flex justify-center items-center gap-4">
+                 <button id="search-again-button" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">Search Again</button>
+                 <a id="compare-button" href="#" class="hidden compare-button-enter bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">Compare Selected (0)</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const budgetSection = document.getElementById('budget-section');
+            const loaderSection = document.getElementById('loader-section');
+            const resultsSection = document.getElementById('results-section');
+            const findButton = document.getElementById('find-button');
+            const budgetInput = document.getElementById('budget-input');
+            const resultsGrid = document.getElementById('results-grid');
+            const budgetText = document.getElementById('budgetText');
+            const searchAgainButton = document.getElementById('search-again-button');
+            const compareButton = document.getElementById('compare-button');
+            const errorMessage = document.getElementById('error-message');
+
+            let selectedForCompare = [];
+
+            function createLaptopCard(laptop) {
+                return `
+                    <div class="card-enter bg-gray-800/50 border border-gray-700 rounded-xl p-4 flex flex-col sm:flex-row items-center gap-6 text-left">
+                        <div class="flex items-center justify-center pr-4">
+                            <input type="checkbox" data-id="${laptop.id}" class="compare-checkbox h-6 w-6 bg-gray-700 border-gray-600 rounded text-violet-500 focus:ring-violet-600">
+                        </div>
+                        <img src="${laptop.img}" alt="${laptop.name}" class="w-full sm:w-48 h-32 sm:h-auto object-cover rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/400x300/1a1a1a/ffffff?text=Image+Not+Found';">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">${laptop.name}</h3>
+                            <p class="text-sm text-gray-400 mb-3">${laptop.brand}</p>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                <p><i class="fa-solid fa-microchip text-violet-400 w-5"></i> ${laptop.specs.cpu}</p>
+                                <p><i class="fa-solid fa-memory text-violet-400 w-5"></i> ${laptop.specs.ram}</p>
+                                <p><i class="fa-solid fa-hard-drive text-violet-400 w-5"></i> ${laptop.specs.storage}</p>
+                                <p><i class="fa-solid fa-display text-violet-400 w-5"></i> ${laptop.specs.display}</p>
+                            </div>
+                        </div>
+                        <div class="text-center sm:text-right w-full sm:w-auto mt-4 sm:mt-0">
+                            <p class="text-2xl font-bold mb-2">₹${laptop.price.toLocaleString('en-IN')}</p>
+                            <a href="details.html?id=${laptop.id}" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm">More Details</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function updateCompareButton() {
+                const count = selectedForCompare.length;
+                compareButton.textContent = `Compare Selected (${count})`;
+                if (count >= 2) {
+                    compareButton.classList.remove('hidden');
+                    setTimeout(() => compareButton.classList.add('compare-button-active'), 10);
+                    // This is the line that connects to your new compare page
+                    const compareUrl = `compare.html?compare=${selectedForCompare.join(',')}`;
+                    compareButton.href = compareUrl;
+                } else {
+                    compareButton.classList.remove('compare-button-active');
+                    setTimeout(() => compareButton.classList.add('hidden'), 300);
+                }
+            }
+
+            function findAndDisplayLaptops() {
+                errorMessage.textContent = '';
+                const budget = parseInt(budgetInput.value);
+                if (isNaN(budget) || budget <= 0) {
+                    errorMessage.textContent = "Please enter a valid budget.";
+                    return;
+                }
+                budgetSection.classList.add('hidden');
+                loaderSection.classList.remove('hidden');
+                loaderSection.classList.add('flex');
+                
+                setTimeout(() => {
+                    loaderSection.classList.add('hidden');
+                    loaderSection.classList.remove('flex');
+                    resultsSection.classList.remove('hidden');
+                    resultsGrid.innerHTML = ''; 
+                    selectedForCompare = [];
+                    updateCompareButton();
+
+                    if (budget < 32000) {
+                        resultsGrid.innerHTML = `<p class="text-gray-400 col-span-1 text-lg">There are no good laptops in this segment. We recommend increasing your budget to at least ₹32,000 for a reliable device.</p>`;
+                    } else {
+                        const filteredLaptops = laptops.filter(laptop => laptop.price <= budget).sort((a, b) => b.price - a.price).slice(0, 5);
+                        if (filteredLaptops.length === 0) {
+                            resultsGrid.innerHTML = `<p class="text-gray-400 col-span-1">No laptops found within your budget. Try a higher amount.</p>`;
+                        } else {
+                            filteredLaptops.forEach((laptop, index) => {
+                                const cardHTML = createLaptopCard(laptop);
+                                resultsGrid.insertAdjacentHTML('beforeend', cardHTML);
+                                setTimeout(() => {
+                                    if (resultsGrid.children[index]) {
+                                        resultsGrid.children[index].classList.add('card-enter-active');
+                                    }
+                                }, index * 100);
+                            });
+                        }
+                    }
+                    budgetText.textContent = `₹${budget.toLocaleString('en-IN')}`;
+                }, 1500);
+            }
+
+            function resetSearch() {
+                resultsSection.classList.add('hidden');
+                budgetSection.classList.remove('hidden');
+                budgetInput.value = '';
+                errorMessage.textContent = '';
+                selectedForCompare = [];
+                updateCompareButton();
+            }
+
+            resultsGrid.addEventListener('change', (e) => {
+                if (e.target.classList.contains('compare-checkbox')) {
+                    const laptopId = e.target.dataset.id;
+                    if (e.target.checked) {
+                        if (selectedForCompare.length < 4) {
+                            selectedForCompare.push(laptopId);
+                        } else {
+                            e.target.checked = false;
+                            alert("You can only compare up to 4 laptops at a time.");
+                        }
+                    } else {
+                        selectedForCompare = selectedForCompare.filter(id => id !== laptopId);
+                    }
+                    updateCompareButton();
+                }
+            });
+
+            findButton.addEventListener('click', findAndDisplayLaptops);
+            searchAgainButton.addEventListener('click', resetSearch);
+            budgetInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') findAndDisplayLaptops();
+            });
+        });
+    </script>
+</body>
+</html>

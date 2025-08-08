@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablet Details - ZENTRA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0c0a09; color: #f0f0f0; }
+        .spec-table th, .spec-table td { padding: 1rem; text-align: left; }
+        .spec-table th { background-color: #1f2937; }
+        .spec-table tr:nth-child(even) td { background-color: #111827; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <header class="w-full p-6">
+        <nav class="flex justify-between items-center max-w-7xl mx-auto">
+            <a href="index.html" class="text-2xl font-bold tracking-tighter">ZENTRA</a>
+            <a href="tablet.html" class="text-gray-300 hover:text-white transition-colors">&larr; Back to Search</a>
+        </nav>
+    </header>
+
+    <main id="details-content" class="w-full max-w-7xl mx-auto p-4">
+        <div id="loader" class="flex justify-center items-center py-20">
+            <p class="text-2xl text-gray-500">Loading details...</p>
+        </div>
+    </main>
+
+    <script src="tablet-data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const detailsContent = document.getElementById('details-content');
+            const loader = document.getElementById('loader');
+
+            if (typeof tablets === 'undefined') {
+                detailsContent.innerHTML = `<p class="text-red-500 text-2xl">Error: Tablet data could not be loaded.</p>`;
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const singleId = urlParams.get('id');
+            const compareIds = urlParams.get('compare');
+
+            loader.style.display = 'none';
+
+            if (singleId) {
+                renderSingleView(singleId);
+            } else if (compareIds) {
+                renderCompareView(compareIds.split(','));
+            } else {
+                detailsContent.innerHTML = `<p class="text-red-500 text-2xl">Error: No tablet selected.</p>`;
+            }
+
+            function renderSingleView(tabletId) {
+                const tablet = tablets.find(p => p.id === tabletId);
+                if (!tablet) {
+                    detailsContent.innerHTML = `<p class="text-red-500 text-2xl">Error: Tablet not found.</p>`;
+                    return;
+                }
+                const detailsHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 text-left max-w-4xl mx-auto">
+                        <div class="bg-gray-800/50 p-4 rounded-xl border border-gray-700">
+                            <img src="${tablet.img}" alt="${tablet.name}" class="w-full h-auto object-contain rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1a1a1a/ffffff?text=Image+Not+Found';">
+                        </div>
+                        <div>
+                            <h1 class="text-3xl md:text-4xl font-bold">${tablet.name}</h1>
+                            <p class="text-lg text-gray-400 mb-4">${tablet.brand}</p>
+                            <p class="text-4xl font-bold text-violet-400 mb-6">₹${tablet.price.toLocaleString('en-IN')}</p>
+                            <h2 class="text-2xl font-semibold mb-4 border-b border-gray-700 pb-2">Key Specifications</h2>
+                            <div class="space-y-3 text-lg">
+                                <p><i class="fa-solid fa-microchip text-gray-400 w-6"></i> <strong>Processor:</strong> ${tablet.specs.cpu}</p>
+                                <p><i class="fa-solid fa-memory text-gray-400 w-6"></i> <strong>RAM:</strong> ${tablet.specs.ram}</p>
+                                <p><i class="fa-solid fa-hard-drive text-gray-400 w-6"></i> <strong>Storage:</strong> ${tablet.specs.storage}</p>
+                                <p><i class="fa-solid fa-tablet-screen-button text-gray-400 w-6"></i> <strong>Display:</strong> ${tablet.specs.display}</p>
+                                <p><i class="fa-solid fa-camera text-gray-400 w-6"></i> <strong>Camera:</strong> ${tablet.specs.camera}</p>
+                                <p><i class="fa-solid fa-battery-full text-gray-400 w-6"></i> <strong>Battery:</strong> ${tablet.specs.battery}</p>
+                            </div>
+                            <a href="https://www.amazon.in/s?k=${tablet.name.split(' ').join('+')}" target="_blank" class="mt-8 inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors">Buy Now on Amazon</a>
+                        </div>
+                    </div>
+                `;
+                detailsContent.innerHTML = detailsHTML;
+            }
+
+            function renderCompareView(tabletIds) {
+                const tabletsToCompare = tablets.filter(p => tabletIds.includes(p.id));
+                if (tabletsToCompare.length < 2) {
+                    detailsContent.innerHTML = `<p class="text-yellow-500 text-2xl">Please select at least two tablets to compare.</p>`;
+                    return;
+                }
+
+                const specKeys = ['cpu', 'ram', 'storage', 'display', 'camera', 'battery'];
+                const specLabels = { cpu: 'Processor', ram: 'RAM', storage: 'Storage', display: 'Display', camera: 'Camera', battery: 'Battery' };
+
+                let tableHTML = `
+                    <h1 class="text-3xl md:text-4xl font-bold mb-8 text-center">Tablet Comparison</h1>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[800px] text-sm md:text-base border-collapse spec-table">
+                            <thead>
+                                <tr>
+                                    <th class="w-1/5">Feature</th>
+                                    ${tabletsToCompare.map(tablet => `
+                                        <th class="w-1/5">
+                                            <img src="${tablet.img}" alt="${tablet.name}" class="h-24 mx-auto object-contain rounded-md mb-2" onerror="this.onerror=null;this.src='https://placehold.co/400x300/1a1a1a/ffffff?text=Image';">
+                                            <p class="font-bold">${tablet.name}</p>
+                                            <p class="text-violet-400 font-semibold">₹${tablet.price.toLocaleString('en-IN')}</p>
+                                        </th>
+                                    `).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${specKeys.map(key => `
+                                    <tr>
+                                        <td class="font-semibold text-gray-300">${specLabels[key]}</td>
+                                        ${tabletsToCompare.map(tablet => `<td>${tablet.specs[key]}</td>`).join('')}
+                                    </tr>
+                                `).join('')}
+                                <tr>
+                                    <td class="font-semibold text-gray-300">Buy</td>
+                                    ${tabletsToCompare.map(tablet => `
+                                        <td>
+                                            <a href="https://www.amazon.in/s?k=${tablet.name.split(' ').join('+')}" target="_blank" class="inline-block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-colors">View Deal</a>
+                                        </td>
+                                    `).join('')}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                detailsContent.innerHTML = tableHTML;
+            }
+        });
+    </script>
+</body>
+</html>
